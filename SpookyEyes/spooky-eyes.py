@@ -8,9 +8,19 @@ import random
 import time
 
 try:
-    import Adafruit_WS2801.WS2801Pixels as WS2801
-    import Adafruit_WS2801.RGB_to_color as WS2801_rgb_to_color
-    import Adafruit_GPIO.SPI.SpiDev as SpiDev
+    import Adafruit_WS2801
+    import Adafruit_WS2801
+    import Adafruit_GPIO
+
+    def WS2801(np, spi):
+        return Adafruit_WS2801.WS2801Pixels(np, spi = spi)
+
+    def WS2801_rgb_to_color(r, g, b):
+        return Adafruit_WS2801.RGB_to_color(r, g, b)
+
+    def SpiDev(port, device):
+        return Adafruit_GPIO.SPI.SpiDev(port, device)
+
 except ImportError:
     print "Missing Adafruit WS2801 or GPIO libraries."
     print "Using no-op implementations."
@@ -137,10 +147,13 @@ class Blinker:
 
 class Eyes:
 
-    def __init__(self):
+    def __init__(self, num_pixels):
+        # to account for the +1 for "right" eye and the zero index
+        # of the first pixel
+        self.num_pixels = num_pixels - 2
+        
         self.countdown = 0
         self.blinkers = [Blinker() for x in xrange(MAX_EYES)]
-
 
     def update_eyes(self):
         actions = []
@@ -149,7 +162,7 @@ class Eyes:
 
         for i in xrange(MAX_EYES):
             if (self.countdown <= 0) and (self.blinkers[i].active == False):
-                newPos = random.randint(0, NUM_PIXELS / 2) * 2
+                newPos = random.randint(0, int(self.num_pixels / 2)) * 2
 
                 for j in xrange(MAX_EYES):
                     if (self.blinkers[j].deadtime > 0) and (abs(newPos - self.blinkers[j].pos) < 4):
@@ -167,6 +180,10 @@ class Eyes:
 
 def apply_actions(pixels, actions):
     for action in actions:
+        if action.ledNumber >= pixels.count() or action.ledNumber < 0:
+            print "WARNING: pixel number %d is invalid." % (action.ledNumber,)
+            continue
+        
         (hue, lightness, saturation) = colorsys.rgb_to_hls(action.red, action.green, action.blue)
 
         (r, g, b) = colorsys.hls_to_rgb(hue, action.intensity, saturation)
@@ -185,7 +202,7 @@ def main():
     spi = SpiDev(SPI_PORT, SPI_DEVICE)
     pixels = WS2801(NUM_PIXELS, spi)
 
-    eyes = Eyes()
+    eyes = Eyes(NUM_PIXELS)
 
     pixels.clear()
     pixels.show()
