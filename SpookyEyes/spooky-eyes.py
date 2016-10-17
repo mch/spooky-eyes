@@ -208,14 +208,19 @@ def main():
     pixels.show()
 
     startTime = time.time()
-    while True:
-        time.sleep(0.01) # 10 ms
-        currentTime = time.time()
-        dt = (currentTime - startTime) * 1000
-        if dt > STEP_INTERVAL:
-            actions = eyes.update_eyes()
-            apply_actions(pixels, actions)
-            startTime = time.time()
+    try:
+        while True:
+            time.sleep(0.01) # 10 ms
+            currentTime = time.time()
+            dt = (currentTime - startTime) * 1000
+            if dt > STEP_INTERVAL:
+                actions = eyes.update_eyes()
+                apply_actions(pixels, actions)
+                startTime = time.time()
+
+    except KeyboardInterrupt:
+        pixels.clear()
+        pixels.show()
 
 
 if __name__ == '__main__':
