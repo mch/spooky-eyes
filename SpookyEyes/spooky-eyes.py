@@ -184,11 +184,11 @@ def apply_actions(pixels, actions):
             print "WARNING: pixel number %d is invalid." % (action.ledNumber,)
             continue
         
-        (hue, lightness, saturation) = colorsys.rgb_to_hls(action.red, action.green, action.blue)
+        (hue, lightness, saturation) = colorsys.rgb_to_hls(action.red / 255.0, action.green / 255.0, action.blue / 255.0)
 
-        (r, g, b) = colorsys.hls_to_rgb(hue, action.intensity, saturation)
+        (r, g, b) = colorsys.hls_to_rgb(hue, lightness * (action.intensity / 75.0), saturation)
 
-        color = WS2801_rgb_to_color(int(round(r)), int(round(g)), int(round(b)))
+        color = WS2801_rgb_to_color(int(round(r * 255.0)), int(round(g * 255.0)), int(round(b * 255.0)))
 
         pixels.set_pixel(action.ledNumber, color)
 
