@@ -1,0 +1,13 @@
+[Unit]
+Description=Run spooky eyes script
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/Work/spooky-eyes/eyes.sh start
+ExecStop=/home/pi/Work/spooky-eyes/eyes.sh stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+

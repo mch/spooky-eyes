@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 # Based on original code for Arduino by Bill Earl of Adafruit Industries
 # https://learn.adafruit.com/random-spooky-led-eyes/the-code
@@ -6,6 +6,13 @@
 import colorsys
 import random
 import time
+import signal
+
+def handler(signum, frame):
+    print 'Signal hander for signal', signum
+    raise KeyboardInterrupt
+
+signal.signal(signal.SIGINT, handler)
 
 try:
     import Adafruit_WS2801
@@ -162,7 +169,8 @@ class Eyes:
 
         for i in xrange(MAX_EYES):
             if (self.countdown <= 0) and (self.blinkers[i].active == False):
-                newPos = random.randint(0, int(self.num_pixels / 2)) * 2
+                #newPos = random.randint(0, int(self.num_pixels / 2)) * 2
+                newPos = random.choice([1, 4, 7, 10, 13])
 
                 for j in xrange(MAX_EYES):
                     if (self.blinkers[j].deadtime > 0) and (abs(newPos - self.blinkers[j].pos) < 4):
